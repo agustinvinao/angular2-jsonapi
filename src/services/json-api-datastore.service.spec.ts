@@ -2,7 +2,12 @@ import {TestBed} from '@angular/core/testing';
 import * as dateParse from 'date-fns/parse';
 import * as qs from 'qs';
 import {Editorial} from '../../test/models/editorial.model';
-import {EDITORIAL_NAME} from '../../test/fixtures/editorial.fixture';
+import {
+    EDITORIAL_NAME,
+    EDITORIAL_ID,
+    getEditorialData,
+    getSampleEditorial
+} from '../../test/fixtures/editorial.fixture';
 import {Author} from '../../test/models/author.model';
 import {AUTHOR_BIRTH,
         AUTHOR_ID,
@@ -176,7 +181,7 @@ describe('JsonApiDatastore', () => {
 
             const req = httpMock.expectOne(BASE_URL + 'books');
             req.flush({
-                data: [getSampleBook(1, '1')],
+                data: [getSampleBook(1, '1', '1')],
                 links: ['http://www.example.org']
             });
             httpMock.verify();
@@ -192,7 +197,26 @@ describe('JsonApiDatastore', () => {
 
             const req = httpMock.expectOne(BASE_URL + 'books');
             req.flush({
-                data: [getSampleBook(1, '1')],
+                data: [getSampleBook(1, '1', '1')],
+                links: ['http://www.example.org'],
+                included: [
+                    getAuthorIncluded()
+                ]
+            });
+            httpMock.verify();
+        });
+
+        it('should get editorial models relationships', () => {
+            datastore.findAll(Editorial).subscribe((document) => {
+                expect(document).toBeDefined();
+                expect(document.getModels().length).toEqual(1);
+                // expect(document.getMeta().links[0]).toEqual('http://www.example.org');
+                expect(document['jsonApiModels'][0]['author']).toBeDefined();
+            });
+
+            const req = httpMock.expectOne(BASE_URL + 'editorials');
+            req.flush({
+                data: [getSampleEditorial(1, '1')],
                 links: ['http://www.example.org'],
                 included: [
                     getAuthorIncluded()
@@ -254,6 +278,18 @@ describe('JsonApiDatastore', () => {
 
             const req = httpMock.expectOne(BASE_URL + 'authors/1');
             req.flush({ data: getAuthorData() });
+            httpMock.verify();
+        });
+
+        it('should get editorial', () => {
+            datastore.findRecord(Editorial, '1').subscribe((editorial) => {
+                expect(editorial).toBeDefined();
+                expect(editorial.id).toBe(EDITORIAL_ID);
+                expect(editorial.name).toEqual(EDITORIAL_NAME);
+            });
+
+            const req = httpMock.expectOne(BASE_URL + 'editorials/1');
+            req.flush({ data: getEditorialData() });
             httpMock.verify();
         });
 

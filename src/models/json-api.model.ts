@@ -88,12 +88,12 @@ export class JsonApiModel {
     if (hasOne) {
       for (let metadata of hasOne) {
         let relationship: any = data.relationships ? data.relationships[metadata.relationship] : null;
-        if (relationship && relationship.data && relationship.data.length > 0) {
-          let typeName: string = relationship.data[0].type;
+        if (relationship && relationship.data && relationship.data) {
+          let typeName: string = relationship.data.type;
           let modelType: ModelType<this> = Reflect.getMetadata('JsonApiDatastoreConfig', this._datastore.constructor).models[typeName];
           if (modelType) {
             let relationshipModel: JsonApiModel = this.getHasOneRelationship(modelType, relationship.data, included, typeName, level);
-            if (relationshipModel.length > 0) {
+            if (relationshipModel) {
               this[metadata.propertyName] = relationshipModel;
             }
           } else {
