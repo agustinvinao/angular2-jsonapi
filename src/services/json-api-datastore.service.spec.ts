@@ -6,7 +6,7 @@ import {
     EDITORIAL_NAME,
     EDITORIAL_ID,
     getEditorialIncluded,
-    getEditorialrData
+    getEditorialData
 } from '../../test/fixtures/editorial.fixture';
 import {Author} from '../../test/models/author.model';
 import {AUTHOR_BIRTH,
@@ -264,16 +264,15 @@ describe('JsonApiDatastore', () => {
 
         it('should get editorial with hasOne relation author', () => {
             datastore.findRecord(Editorial, '1').subscribe((editorial) => {
-                console.log('%c editorial: ', 'background-color: red; color: white;', editorial);
                 expect(editorial).toBeDefined();
                 expect(editorial.author).toBeDefined();
             });
 
             const req = httpMock.expectOne(BASE_URL + 'editorials/1');
             req.flush({
-                data: getEditorialrData(),
+                data: getEditorialData('author'),
                 included: [
-                    getEditorialIncluded()
+                    getAuthorIncluded()
                 ]
             });
             httpMock.verify();

@@ -146,7 +146,7 @@ export class JsonApiModel {
 
   private getHasOneRelationship<T extends JsonApiModel>(modelType: ModelType<T>, data: any, included: any, typeName: string, level: number, type_one: string): T {
     let id: string = data.id;
-    let relationshipData: any = data;
+    let relationshipData: any = find(included, {id: data.id, type: typeName});
     if (relationshipData) {
       let newObject: T = this.createOrPeek(modelType, relationshipData);
       if (level <= 1) {

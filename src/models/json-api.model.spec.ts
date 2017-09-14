@@ -3,9 +3,15 @@ import * as dateParse from 'date-fns/parse';
 import { Author } from '../../test/models/author.model';
 import {
     AUTHOR_ID, AUTHOR_NAME, AUTHOR_BIRTH, AUTHOR_DEATH,
-    AUTHOR_CREATED, AUTHOR_UPDATED, getAuthorData, getIncludedBooks, BOOK_TITLE, BOOK_PUBLISHED, CHAPTER_TITLE
+    AUTHOR_CREATED, AUTHOR_UPDATED, getAuthorData, getAuthorIncluded,
+    getIncludedBooks, BOOK_TITLE, BOOK_PUBLISHED, CHAPTER_TITLE
 } from '../../test/fixtures/author.fixture';
 import { Book } from '../../test/models/book.model';
+import { Editorial } from '../../test/models/editorial.model';
+import {
+  EDITORIAL_ID, EDITORIAL_NAME, EDITORIAL_CREATED, EDITORIAL_UPDATED, 
+  getEditorialIncluded, getEditorialData, getIncludedAuthor
+} from '../../test/fixtures/editorial.fixture';
 import { Http, BaseRequestOptions, ConnectionBackend } from '@angular/http';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
@@ -64,7 +70,7 @@ describe('JsonApiModel', () => {
 
   describe('syncRelationships', () => {
 
-    let author: Author;
+    let author: Author, editorial: Editorial;
 
     it('should return the object when there is no relationship included', () => {
       author = new Author(datastore, getAuthorData());
@@ -76,6 +82,20 @@ describe('JsonApiModel', () => {
       expect(author.created_at.valueOf()).toBe(dateParse(AUTHOR_CREATED).valueOf());
       expect(author.updated_at.valueOf()).toBe(dateParse(AUTHOR_UPDATED).valueOf());
       expect(author.books).toBeUndefined();
+    });
+
+    describe('parseHasOne', () => {
+      it('should return the parsed relationship when is is included', () => {
+        const DATA = getEditorialData('author');
+        editorial = new Editorial(datastore, DATA);
+        editorial.syncRelationships(DATA, getIncludedAuthor(), 0);
+        expect(editorial).toBeDefined();
+        expect(editorial.id).toBe(EDITORIAL_ID);
+        expect(editorial.name).toBe(EDITORIAL_NAME);
+        expect(editorial.author).toBeDefined();
+        expect(editorial.author.id).toBe(AUTHOR_ID);
+        expect(editorial.author.name).toBe(AUTHOR_NAME);
+      });
     });
 
     describe('parseHasMany', () => {

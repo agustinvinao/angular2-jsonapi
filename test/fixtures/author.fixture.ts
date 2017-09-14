@@ -1,4 +1,5 @@
 import {getSampleBook} from "./book.fixture";
+import {EDITORIAL_ID} from './editorial.fixture';
 export const AUTHOR_ID = '1';
 export const AUTHOR_NAME = 'J. R. R. Tolkien';
 export const AUTHOR_BIRTH = '1892-01-03';
@@ -10,6 +11,41 @@ export const BOOK_TITLE = 'The Fellowship of the Ring';
 export const BOOK_PUBLISHED = '1954-07-29';
 
 export const CHAPTER_TITLE = 'The Return Journey';
+
+export function getSampleAuthor(authorId: string, editorialId: string) {
+  return {
+      'id': authorId,
+      'type': 'authors',
+      'attributes': {
+        'name': AUTHOR_NAME,
+        'date_of_birth': AUTHOR_BIRTH,
+        'date_of_death': AUTHOR_DEATH,
+        'created_at': AUTHOR_CREATED,
+        'updated_at': AUTHOR_UPDATED
+      },
+      'relationships': {
+          'editorial': {
+              'links': {
+                  'self': '/v1/authors/1/relationships/editorial',
+                  'related': '/v1/authors/1/editorial'
+              },
+              'data': {
+                  'id': editorialId,
+                  'type': 'editorials'
+              }
+          },
+          'books': {
+            'links': {
+              'self': '/v1/authors/1/relationships/books',
+              'related': '/v1/authors/1/books'
+            }
+          },
+      },
+      'links': {
+          'self': '/v1/authors/1'
+      }
+  }
+}
 
 export function getAuthorData(relationship?: string, total?: number): any {
   let response: any = {
@@ -36,6 +72,12 @@ export function getAuthorData(relationship?: string, total?: number): any {
         'type': 'books'
       });
     }
+  }
+  if (relationship && relationship.indexOf('author')) {
+    response.relationships.author.data = {
+      'id': '' + EDITORIAL_ID,
+      'type': 'authors'
+    };
   }
   return response;
 };

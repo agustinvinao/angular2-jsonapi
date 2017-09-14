@@ -3,9 +3,9 @@ export const EDITORIAL_NAME = 'Editorial example';
 export const EDITORIAL_CREATED = '2016-09-26T21:12:40Z';
 export const EDITORIAL_UPDATED = '2016-09-26T21:12:45Z';
 
-import { AUTHOR_ID, AUTHOR_NAME } from './author.fixture';
+import { AUTHOR_ID, AUTHOR_NAME, getSampleAuthor } from './author.fixture';
 
-export function getEditorialrData(relationship?: string, total?: number): any {
+export function getEditorialData(relationship?: string, total?: number): any {
   let response: any = {
     'id': EDITORIAL_ID,
     'type': 'editorials',
@@ -16,19 +16,9 @@ export function getEditorialrData(relationship?: string, total?: number): any {
     },
     'relationships': {
       'books': {'links': {'self': '/v1/authors/1/relationships/books', 'related': '/v1/authors/1/books'}},
-      'author': {
-        'links': {
-          'self': '/v1/editorials/1/relationships/author',
-          'related': '/v1/editorials/1/author'
-        },
-        'data': {
-          'id': AUTHOR_ID,
-          'name': AUTHOR_NAME,
-          'type': 'authors'
-        }
-      }
+      'author': { 'links': { 'self': '/v1/editorials/1/relationships/author', 'related': '/v1/editorials/1/author'}}
     },
-    'links': {'self': '/v1/authors/1'}
+    'links': {'self': '/v1/editorials/1'}
   };
   if (relationship && relationship.indexOf('books') !== -1) {
     response.relationships.books.data = [];
@@ -38,6 +28,13 @@ export function getEditorialrData(relationship?: string, total?: number): any {
         'type': 'books'
       });
     }
+  }
+
+  if (relationship && relationship.indexOf('author') !== -1) {
+    response.relationships.author.data = {
+      'id': '' + EDITORIAL_ID,
+      'type': 'authors'
+    };
   }
   return response;
 };
@@ -61,4 +58,11 @@ export function getEditorialIncluded() {
       }
     }
   }
+}
+
+export function getIncludedAuthor(): any[] {
+  
+  let responseArray: any[] = [];
+  responseArray.push(getSampleAuthor(AUTHOR_ID,EDITORIAL_ID))
+  return responseArray;
 }
